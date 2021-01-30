@@ -44,7 +44,6 @@ Create Valid Wallet
     ${resp}=  POST On Session    WALLETS   ${URL}     json=${data}   expected_status=201
     Set Test Variable   ${response}  ${resp}
     Set Test Variable   ${id}  ${resp.json()['id']}
-          
 
 Create Wallet With Invalid Type Should Be 400
     &{data}=    Create dictionary  name=wallet 1    type=X   openingBalance=100
