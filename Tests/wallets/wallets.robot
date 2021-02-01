@@ -2,7 +2,7 @@
 Library               RequestsLibrary
 Library               Collections  
 
-Resource              ../Resources/wallets.resource  
+Resource              wallets.resource  
 
 Suite Setup           Create Session    WALLETS    ${SERVER}
 

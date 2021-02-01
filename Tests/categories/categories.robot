@@ -2,7 +2,7 @@
 Library               RequestsLibrary
 Library               Collections  
 
-Resource              ../Resources/categories.resource  
+Resource              categories.resource  
 
 Suite Setup           Create Session    CATEGORIES    ${SERVER}
 
