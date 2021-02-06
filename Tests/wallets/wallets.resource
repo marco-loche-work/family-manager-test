@@ -1,14 +1,14 @@
 *** Variables ***
-${SERVER}                   http://localhost:8082
-${URL}                      /api/v1/wallets  
+${WALLET_URL}               http://localhost:8082/api/v1/wallets  
 ${WALLET_OPENING_BALANCE}   120
 ${WALLET_TYPE}              MANUAL
 ${WALLET_NAME}              Wallet di test
 
 *** Keywords ***
-Create Valid Wallet
-    &{data}=  Create dictionary  name=${WALLET_NAME}     type=${WALLET_TYPE}   openingBalance=${WALLET_OPENING_BALANCE}
-    ${resp}=  POST On Session    WALLETS   ${URL}     json=${data}   expected_status=201
+Create Valid Wallet     
+    [Arguments]     ${type}=${WALLET_TYPE}
+    &{data}=  Create dictionary  name=${WALLET_NAME}     type=${type}   openingBalance=${WALLET_OPENING_BALANCE}
+    ${resp}=  POST On Session    WALLETS   /     json=${data}   expected_status=201
     Set Test Variable   ${response}  ${resp}
     Set Test Variable   ${id}  ${resp.json()['id']}
     [Return]    ${id}
@@ -21,15 +21,15 @@ Create List Of Wallets
 
 Create Wallet With Invalid Type Should Be 400
     &{data}=    Create dictionary  name=wallet 1    type=X   openingBalance=100
-    ${resp}=    POST On Session    WALLETS   ${URL}     json=${data}     expected_status=400
+    ${resp}=    POST On Session    WALLETS   /     json=${data}     expected_status=400
 
 Get Wallet 
     [Arguments]     ${wallet_id}
-    ${resp}=    GET On Session      WALLETS      ${URL}/${id}    expected_status=200
+    ${resp}=    GET On Session      WALLETS      /${id}    expected_status=200
     [return]  ${resp.json()}
 
 Wallet Should Be Exist
-    GET On Session      WALLETS      ${URL}/${id}    expected_status=200
+    GET On Session      WALLETS      /${id}    expected_status=200
 
 Wallet Should Have All Data
     ${wallet}=    Get Wallet   ${id}
@@ -39,41 +39,41 @@ Wallet Should Have All Data
     Should Be Equal As Numbers     ${wallet['openingBalance']}     ${WALLET_OPENING_BALANCE}
 
 Wallets Lenght Should Be Greater Than One
-    ${resp}=    GET On Session      WALLETS      ${URL}    expected_status=200
+    ${resp}=    GET On Session      WALLETS      /    expected_status=200
     ${count}=   Get length    ${resp.json()}
     Should Be True      ${count}>1
 
 Get Wallet Should Be 404
-    GET On Session      WALLETS      ${URL}/X    expected_status=404
+    GET On Session      WALLETS      /X    expected_status=404
 
 Modify Created Wallet
     ${wallet}=    Get Wallet   ${id}
     Set To dictionary   ${wallet}     name='modified name'
-    PUT On Session  WALLETS  ${URL}/${id}    json=${wallet}    expected_status=204 
+    PUT On Session  WALLETS  /${id}    json=${wallet}    expected_status=204 
     ${wallet}=    Get Wallet   ${id}
     Should Be Equal As Strings      ${wallet['name']}  'modified name'
 
 Modify Non Existing Wallet Should Be 404
     &{data}=    Create dictionary  id=X  name=wallet 1    type=${WALLET_TYPE}   openingBalance=100
-    PUT On Session  WALLETS  ${URL}/X    json=&{data}    expected_status=404 
+    PUT On Session  WALLETS  /X    json=&{data}    expected_status=404 
 
 Modify Wallet With Invalid Id Should Be 400
     &{data}=    Create dictionary  id=Y  name=wallet 1    type=${WALLET_TYPE}   openingBalance=100
-    PUT On Session  WALLETS  ${URL}/X    json=&{data}   expected_status=400 
+    PUT On Session  WALLETS  /X    json=&{data}   expected_status=400 
 
 Modify Wallet With Invalid Type Should Be 400
     ${wallet}=    Get Wallet   ${id}
     Set To dictionary   ${wallet}     type='X'
-    PUT On Session  WALLETS  ${URL}/${id}    json=${wallet}    expected_status=400 
+    PUT On Session  WALLETS  /${id}    json=${wallet}    expected_status=400 
 
 Delete Wallet
     [Arguments]     ${wallet_id}=${id}
-    DELETE On Session  WALLETS  ${URL}/${wallet_id}  expected_status=204
+    DELETE On Session  WALLETS  /${wallet_id}  expected_status=204
 
 Delete Wallets
     [Arguments]     
-    DELETE On Session  WALLETS  ${URL}/${ids[0]}  expected_status=204
-    DELETE On Session  WALLETS  ${URL}/${ids[1]}  expected_status=204
+    DELETE On Session  WALLETS  /${ids[0]}  expected_status=204
+    DELETE On Session  WALLETS  /${ids[1]}  expected_status=204
 
 Delete Non Existing Wallet Should Be Not Found
-    DELETE On Session  WALLETS  ${URL}/non_existing_wallet_id  expected_status=404
+    DELETE On Session  WALLETS  /non_existing_wallet_id  expected_status=404

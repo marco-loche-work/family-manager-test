@@ -4,7 +4,7 @@ Library               Collections
 
 Resource              categories.resource  
 
-Suite Setup           Create Session    CATEGORIES    ${SERVER}
+Suite Setup           Create Session    CATEGORIES    ${CATEGORIES_URL}
 
 *** Test Cases ***
 User can create a valid category

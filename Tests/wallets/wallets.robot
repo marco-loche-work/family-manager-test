@@ -4,7 +4,7 @@ Library               Collections
 
 Resource              wallets.resource  
 
-Suite Setup           Create Session    WALLETS    ${SERVER}
+Suite Setup           Create Session    WALLETS    ${WALLET_URL}
 
 
 *** Test Cases ***
