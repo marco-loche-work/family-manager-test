@@ -95,6 +95,13 @@ User Cannot Modify Non Existing Manual Transaction
     Update Transaction Should Return 404 
     [Teardown]  Delete Wallet     ${walletId}
 
+User Cannot Modify Manual Transaction With Non Existing Category
+    [Setup]    Setup Inbound Transaction
+    Update Transaction Should Return 400 If Category Type Changes   transactionId=${transactionId}     categoryId=X
+    [Teardown]  Run Keywords  Delete Transaction    ${transactionId}     AND
+    ...                       Delete Wallet     ${walletId}    AND     
+    ...                       Delete Category     ${categoryId}
+
 User Cannot Modify Manual Transaction If Category Type Changes
     [Setup]    Setup Inbound Transaction
     ${outboundCategoryId}=  Create Outbound Category
@@ -115,9 +122,9 @@ Setup Inbound Transaction
 
 Setup Outbound Transaction
     Create Manual Wallet
-    ${categoryId}=   Create Inbound Category
+    ${categoryId}=   Create Outbound Category
     Set Test Variable   ${categoryId}
-    ${transactionId}=   Create Inbound Transaction    categoryId=${categoryId}
+    ${transactionId}=   Create Outbound Transaction    categoryId=${categoryId}
     Set Test Variable   ${transactionId}
 
 Delete All Entities
