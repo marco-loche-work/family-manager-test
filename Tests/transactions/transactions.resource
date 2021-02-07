@@ -54,9 +54,8 @@ Create Transaction
     [Arguments]     ${type}     ${categoryId}=${None}
     &{transaction}=  Build Manual Transaction   type=${type}    walletId=${walletId}    categoryId=${categoryId}
     ${resp}=  POST On Session    TRANSACTIONS   /     json=&{transaction}   expected_status=201
-    Set Test Variable   ${response}  ${resp}
-    Set Test Variable   ${id}  ${resp.json()['id']}
-    [Return]    ${id}
+    Set Test Variable   ${transactionId}    ${resp.json()['id']}
+    [Return]    ${transactionId}
 
 Create List Of Transactions
     ${id1}=     Create Transaction  type=INBOUND
@@ -87,7 +86,7 @@ Create Transaction On Non Existing Wallet Should Return Invalid Response
     ${resp}=  POST On Session    TRANSACTIONS   /     json=&{transaction}   expected_status=400
 
 Get Transaction By Id   
-    [Arguments]     ${transactionId}=${id}
+    [Arguments]     ${transactionId}=${transactionId}
     ${resp}=    GET On Session      TRANSACTIONS      /${transactionId}    expected_status=200
     [return]  ${resp.json()}
 
@@ -99,14 +98,21 @@ Transactions Lenght Should Be Greater Than One
     ${count}=   Get length    ${resp.json()}
     Should Be True      ${count}>1
 
+Transactions Count Should Be N
+    [Arguments]     ${walletId}=${walletId}     ${count}=0
+    ${params}=      Create dictionary   wallet=${walletId}
+    ${resp}=    GET On Session      TRANSACTIONS      /search     params=${params}    expected_status=200
+    ${transactionsCount}=   Get length    ${resp.json()}
+    Should Be Equal As Numbers      ${transactionsCount}    ${count}
+
 Delete Transactions
     [Arguments]     
     DELETE On Session  TRANSACTIONS  /${ids[0]}  expected_status=204
     DELETE On Session  TRANSACTIONS  /${ids[1]}  expected_status=204
 
 Created Transaction Should Be Correct
-    [Arguments]     ${type}
-    ${transaction}=  Get Transaction By Id
+    [Arguments]     ${type}     ${transactionId}=${transactionId}
+    ${transaction}=  Get Transaction By Id  ${transactionId}
     Should Not Be Empty     ${transaction['id']}
     Should Be Equal As Strings     ${transaction['walletId']}    ${walletId}
     Should Be Equal As Strings     ${transaction['description']}    ${TRANSACTION_DESCRIPTION}
@@ -115,14 +121,14 @@ Created Transaction Should Be Correct
     Should Be Equal As Numbers     ${transaction['amount']}     ${TRANSACTION_AMOUNT}
 
 Delete Transaction
-    [Arguments]     ${transactionId}=${id}
+    [Arguments]     ${transactionId}=${transactionId}
     DELETE On Session  TRANSACTIONS  /${transactionId}  expected_status=204
 
 Delete Transaction Should Return 404
     DELETE On Session  TRANSACTIONS  /X  expected_status=404
 
 Update Transaction
-    [Arguments]     ${transactionId}=${id}
+    [Arguments]     ${transactionId}=${transactionId}
     ${transaction}=    Get Transaction By Id  ${transactionId}
     Set To dictionary   ${transaction}     description='modified description'
     PUT On Session  TRANSACTIONS  /${transactionId}    json=${transaction}    expected_status=204 
@@ -130,7 +136,7 @@ Update Transaction
     Should Be Equal As Strings      ${transaction['description']}  'modified description'
 
 Update Transaction Should Return 404 
-    [Arguments]     ${transactionId}=${id}
+    [Arguments]     ${transactionId}=${transactionId}
     &{transaction}=  Build Manual Transaction   id=X  type=OUTBOUND   walletId=${walletId}
     PUT On Session  TRANSACTIONS  /X    json=${transaction}    expected_status=404 
 

@@ -11,6 +11,7 @@ Suite Setup       Suite Setup
 *** Variables ***
 ${categoryId}=      ${None}
 ${walletId}=        ${None}
+${transactionId}=   ${None}
 
 
 *** Test Cases ***
@@ -18,7 +19,7 @@ ${walletId}=        ${None}
 User Can Read A Transaction
     [Setup]    Setup Inbound Transaction
     Get Transaction By Id
-    [Teardown]  Run Keywords    Delete Transaction  ${transactionId}  AND  
+    [Teardown]  Run Keywords    Delete Transaction  AND  
     ...         Delete Wallet       ${walletId}  AND 
     ...         Delete Category     ${categoryId}
 
@@ -40,9 +41,9 @@ User Can Create Outbound Manual Transaction
 User Can Create Inbound Manual Transaction
     [Setup]    Create Manual Wallet
     ${category}=    Create Inbound Category
-    Create Inbound Transaction      categoryId=${category}
-    Created Transaction Should Be Correct   type=INBOUND
-    [Teardown]  Run Keywords    Delete Transaction  AND
+    ${id}=  Create Inbound Transaction      categoryId=${category}
+    Created Transaction Should Be Correct   transactionId=${id}     type=INBOUND
+    [Teardown]  Run Keywords    Delete Transaction  ${id}   AND
     ...                         Delete Wallet  ${walletId}  AND
     ...                         Delete Category  category_id=${category}
 
@@ -111,7 +112,22 @@ User Cannot Modify Manual Transaction If Category Type Changes
     ...                       Delete Category     ${outboundCategoryId}  AND
     ...                       Delete Category     ${categoryId}
 
+User Can Delete Wallet With Transactions And All Transactions Will Be Deleted
+    [Setup]     Run Keywords    Create Valid Wallet     AND     Setup Multiple Transactions
+    Transactions Count Should Be N      count=3
+    Delete Wallet
+    Transactions Count Should Be N      count=0
+    [Teardown]  Delete category     ${categoryId}    
+
 ***Keywords***
+
+Setup Multiple Transactions
+    Create Manual Wallet
+    ${id}=  Create Outbound Category
+    Set Suite Variable      ${categoryId}   ${id}
+    Create Outbound Transaction     categoryId=${categoryId}
+    Create Outbound Transaction     categoryId=${categoryId}
+    Create Outbound Transaction     categoryId=${categoryId}
 
 Setup Inbound Transaction
     Create Manual Wallet
@@ -128,7 +144,7 @@ Setup Outbound Transaction
     Set Test Variable   ${transactionId}
 
 Delete All Entities
-    Delete Transaction
+    Delete Transaction  ${transactionId}
     Delete Wallet  ${walletId}
     Delete Category  ${categoryId}
 

@@ -9,9 +9,8 @@ Create Valid Wallet
     [Arguments]     ${type}=${WALLET_TYPE}
     &{data}=  Create dictionary  name=${WALLET_NAME}     type=${type}   openingBalance=${WALLET_OPENING_BALANCE}
     ${resp}=  POST On Session    WALLETS   /     json=${data}   expected_status=201
-    Set Test Variable   ${response}  ${resp}
-    Set Test Variable   ${id}  ${resp.json()['id']}
-    [Return]    ${id}
+    Set Test Variable   ${walletId}  ${resp.json()['id']}
+    [Return]    ${walletId}
 
 Create List Of Wallets
     ${id1}=     Create Valid Wallet
@@ -24,14 +23,16 @@ Create Wallet With Invalid Type Should Be 400
     ${resp}=    POST On Session    WALLETS   /     json=${data}     expected_status=400
 
 Get Wallet 
-    [Arguments]     ${wallet_id}
+    [Arguments]     ${id}=${walletId}
     ${resp}=    GET On Session      WALLETS      /${id}    expected_status=200
     [return]  ${resp.json()}
 
 Wallet Should Be Exist
+    [Arguments]     ${id}=${walletId}
     GET On Session      WALLETS      /${id}    expected_status=200
 
 Wallet Should Have All Data
+    [Arguments]     ${id}=${walletId}
     ${wallet}=    Get Wallet   ${id}
     Should Not Be Empty     ${wallet['id']}
     Should Not Be Empty     ${wallet['name']}
@@ -47,6 +48,7 @@ Get Wallet Should Be 404
     GET On Session      WALLETS      /X    expected_status=404
 
 Modify Created Wallet
+    [Arguments]     ${id}=${walletId}
     ${wallet}=    Get Wallet   ${id}
     Set To dictionary   ${wallet}     name='modified name'
     PUT On Session  WALLETS  /${id}    json=${wallet}    expected_status=204 
@@ -62,13 +64,14 @@ Modify Wallet With Invalid Id Should Be 400
     PUT On Session  WALLETS  /X    json=&{data}   expected_status=400 
 
 Modify Wallet With Invalid Type Should Be 400
+    [Arguments]     ${id}=${walletId}
     ${wallet}=    Get Wallet   ${id}
     Set To dictionary   ${wallet}     type='X'
     PUT On Session  WALLETS  /${id}    json=${wallet}    expected_status=400 
 
 Delete Wallet
-    [Arguments]     ${wallet_id}=${id}
-    DELETE On Session  WALLETS  /${wallet_id}  expected_status=204
+    [Arguments]     ${id}=${walletId}
+    DELETE On Session  WALLETS  /${id}  expected_status=204
 
 Delete Wallets
     [Arguments]     

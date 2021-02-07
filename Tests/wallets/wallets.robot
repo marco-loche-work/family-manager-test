@@ -51,5 +51,3 @@ User can delete an existing wallet
 
 User cannot delete a non existing wallet
     Delete Non Existing Wallet Should Be Not Found
-
-
