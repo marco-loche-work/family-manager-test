@@ -104,7 +104,7 @@ Transactions Lenght Should Be Greater Than One
     ${count}=   Get length    ${resp.json()}
     Should Be True      ${count}>1
 
-Get Search Params
+Get Params
     [Arguments]     ${walletId}=${walletId}  ${startDate}=${Empty}  ${endDate}=${Empty}  
     ...             ${type}=${Empty}  ${categoryId}=${Empty}
     ${params}=      Create dictionary   wallet=${walletId}  
@@ -118,7 +118,7 @@ Transactions Count Should Be N
     [Arguments]     ${walletId}=${walletId}  ${startDate}=${Empty}  
     ...             ${endDate}=${Empty}  ${type}=${Empty}  ${categoryId}=${Empty}
     ...             ${count}=0
-    ${params}=      Get Search Params   walletId=${walletId}  startDate=${startDate}  endDate=${endDate}  
+    ${params}=      Get Params   walletId=${walletId}  startDate=${startDate}  endDate=${endDate}  
     ...                                 type=${type}  categoryId=${categoryId}
     ${resp}=    GET On Session      TRANSACTIONS      /search     params=${params}    expected_status=200
     ${transactionsCount}=   Get length    ${resp.json()}
@@ -170,3 +170,10 @@ Transaction Category Should Be
     ${transaction}=     Get Transaction By Id  
     ${id}=  Get From Dictionary     ${transaction}     key=categoryId
     Should Be Equal As Strings  ${categoryId}   ${id}
+
+Check Balance Template
+    [Arguments]     ${walletId}=${walletId}  ${limitDate}=${Empty}  ${balance}=0
+    ${params}=      Create dictionary   wallet=${walletId}
+    Run Keyword If      '${limitDate}' != '${Empty}'    Set To Dictionary   ${params}   limitDate=${limitDate}
+    ${resp}=    GET On Session      TRANSACTIONS      /balance     params=${params}    expected_status=200
+    Should Be Equal As Numbers  ${balance}  ${resp.json()['balance']}

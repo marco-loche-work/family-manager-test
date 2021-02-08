@@ -147,6 +147,18 @@ Search Transactions With Category Filter Should Return Expected Result
     ...                         Delete Category  ${inboundCategoryId}  AND  
     ...                         Delete Category  ${outboundCategoryId}
 
+Get Wallet Balance Return Expected Value
+    [Setup]     Setup Multiple Transactions
+    [Template]  Check Balance Template
+    limitDate=2020-01-01   balance=90
+    limitDate=2020-02-01   balance=70
+    limitDate=2020-03-01   balance=170
+    limitDate=${Empty}     balance=170
+    [Teardown]  Run Keywords    Delete Wallet  ${walletId}  AND  
+    ...                         Delete Category  ${inboundCategoryId}  AND  
+    ...                         Delete Category  ${outboundCategoryId}
+    
+
 ***Keywords***
 
 Setup Multiple Transactions
