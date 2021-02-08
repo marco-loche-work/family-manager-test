@@ -147,10 +147,9 @@ Search Transactions With Category Filter Should Return Expected Result
     ...                         Delete Category  ${inboundCategoryId}  AND  
     ...                         Delete Category  ${outboundCategoryId}
 
-Get Wallet Balance Return Expected Value
+Get Balance Return Expected Value
     [Setup]     Setup Multiple Transactions
     [Template]  Check Balance Template
-    limitDate=2020-01-01   balance=90
     limitDate=2020-02-01   balance=70
     limitDate=2020-03-01   balance=170
     limitDate=${Empty}     balance=170
@@ -158,6 +157,25 @@ Get Wallet Balance Return Expected Value
     ...                         Delete Category  ${inboundCategoryId}  AND  
     ...                         Delete Category  ${outboundCategoryId}
     
+Get Balance For Each Wallet Return Expected Value
+    [Setup]     Set Up Multiple Transactions On Two Wallets
+    [Template]  Check Balance For Each Wallet Template
+    walletIds=${walletIds}  limitDate=2020-01-01  balance0=90  balance1=990
+    walletIds=${walletIds}  limitDate=2020-02-01  balance0=70  balance1=970
+    walletIds=${walletIds}  limitDate=2020-03-01  balance0=170  balance1=1070
+    [Teardown]  Tear Down Multiple Transactions On Two Wallets
+
+Get Totals Return Expected Value
+    [Setup]     Set Up Multiple Transactions On Two Wallets
+    [Template]  Check Totals
+    walletIds=${walletIds}  startDate=${Empty}  endDate=2020-01-01  inbound=0  outbound=20  balance=1080  difference=-20
+    walletIds=${walletIds}  startDate=${Empty}  endDate=2020-02-01  inbound=0  outbound=60  balance=1040  difference=-60
+    walletIds=${walletIds}  startDate=${Empty}  endDate=2020-04-01  inbound=200  outbound=60  balance=1240  difference=140
+    walletIds=${walletIds}  startDate=2020-02-01  endDate=${Empty}  inbound=200  outbound=40  balance=1240  difference=160
+    walletIds=${walletIds}  startDate=2020-03-01  endDate=${Empty}  inbound=200  outbound=0  balance=1240  difference=200
+    walletIds=${walletIds}  startDate=2020-01-01  endDate=2020-02-01  inbound=0  outbound=60  balance=1040  difference=-60
+    walletIds=${walletIds}  startDate=2020-02-01  endDate=2020-02-01  inbound=0  outbound=40  balance=1040  difference=-40
+    [Teardown]  Tear Down Multiple Transactions On Two Wallets
 
 ***Keywords***
 
@@ -167,15 +185,34 @@ Setup Multiple Transactions
     Set Test Variable   ${inboundCategoryId}
     ${outboundCategoryId}=   Create Outbound Category
     Set Test Variable   ${outboundCategoryId}
-    ${ids}=    Create List
-    ${id1}=    Create Outbound Transaction     amount=10    date=2020-01-01     categoryId=${outboundCategoryId}
-    Append To List  ${ids}  ${id1}
-    ${id2}=    Create Outbound Transaction     amount=20    date=2020-02-01     categoryId=${outboundCategoryId}
-    Append To List  ${ids}  ${id2}
-    ${id3}=    Create Inbound Transaction      amount=100   date=2020-03-01     categoryId=${inboundCategoryId}
-    Append To List  ${ids}  ${id3}
-    Set Test Variable   ${ids}
-    [Return]    ${ids}
+    Create Outbound Transaction     amount=10    date=2020-01-01     categoryId=${outboundCategoryId}
+    Create Outbound Transaction     amount=20    date=2020-02-01     categoryId=${outboundCategoryId}
+    Create Inbound Transaction      amount=100   date=2020-03-01     categoryId=${inboundCategoryId}
+    
+
+Set Up Multiple Transactions On Two Wallets
+    ${balance_wallet_0}=    Create Manual Wallet    balance=100
+    Set Test Variable   ${balance_wallet_0}
+    ${balance_wallet_1}=    Create Manual Wallet    balance=1000
+    Set Test Variable   ${balance_wallet_1}
+    ${inboundCategoryId}=   Create Inbound Category
+    Set Test Variable   ${inboundCategoryId}
+    ${outboundCategoryId}=   Create Outbound Category
+    Set Test Variable   ${outboundCategoryId}
+    ${walletIds}=   Catenate    SEPARATOR=,   ${balance_wallet_0}  ${balance_wallet_1}
+    Set Test Variable   ${walletIds}
+    Create Outbound Transaction     walletId=${balance_wallet_0}  amount=10   date=2020-01-01  categoryId=${outboundCategoryId}
+    Create Outbound Transaction     walletId=${balance_wallet_0}  amount=20   date=2020-02-01  categoryId=${outboundCategoryId}
+    Create Inbound Transaction      walletId=${balance_wallet_0}  amount=100  date=2020-03-01  categoryId=${inboundCategoryId}
+    Create Outbound Transaction     walletId=${balance_wallet_1}  amount=10   date=2020-01-01  categoryId=${outboundCategoryId}
+    Create Outbound Transaction     walletId=${balance_wallet_1}  amount=20   date=2020-02-01  categoryId=${outboundCategoryId}
+    Create Inbound Transaction      walletId=${balance_wallet_1}  amount=100  date=2020-03-01  categoryId=${inboundCategoryId}
+
+Tear Down Multiple Transactions On Two Wallets
+    Delete Wallet    ${balance_wallet_0}
+    Delete Wallet    ${balance_wallet_1}
+    Delete Category  ${inboundCategoryId}
+    Delete Category  ${outboundCategoryId}
 
 Setup Inbound Transaction
     Create Manual Wallet
@@ -200,3 +237,7 @@ Suite Setup
     Create Session    TRANSACTIONS    ${TRANSCTIONS_URL}
     Create Session    WALLETS         ${WALLET_URL}
     Create Session    CATEGORIES      ${CATEGORIES_URL}
+
+Create Totals
+    &{totals}=  Create Dictionary   inbound=0   outbound=20  balance=1080  difference=-20
+    [Return]    &{totals}   

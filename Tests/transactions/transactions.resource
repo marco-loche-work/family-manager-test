@@ -19,16 +19,19 @@ Build Manual Transaction
 
 Create Manual Wallet
     [Arguments]     ${balance}=${WALLET_OPENING_BALANCE}
-    Create Wallet Of type  MANUAL   balance=${balance}
+    ${id}=  Create Wallet Of type  MANUAL   balance=${balance}
+    [Return]    ${id}
 
 Create Account Wallet
     [Arguments]     ${balance}=${WALLET_OPENING_BALANCE}
-    Create Wallet Of type  ACCOUNT  balance=${balance}
+    ${id}=  Create Wallet Of type  ACCOUNT  balance=${balance}
+    [Return]    ${id}
 
 Create Wallet Of Type
     [Arguments]     ${type}   ${balance}=${WALLET_OPENING_BALANCE}
     ${_id}=    Create Valid Wallet   type=${type}   balance=${balance}
     Set Test Variable  ${walletId}  ${_id}
+    [Return]    ${walletId}
 
 Create Outbound Category
     ${_id}=  Create Category Of type  OUTBOUND
@@ -45,17 +48,22 @@ Create Category Of type
     [Return]    ${_id}
 
 Create Outbound Transaction
-    [Arguments]     ${categoryId}=${categoryId}     ${amount}=${TRANSACTION_AMOUNT}     ${date}=${TRANSACTION_DATE}
-    ${transactionId}=   Create Transaction  type=OUTBOUND   categoryId=${categoryId}    amount=${amount}    date=${date}
+    [Arguments]     ${walletId}=${walletId}  ${categoryId}=${categoryId}  ${amount}=${TRANSACTION_AMOUNT}     
+    ...             ${date}=${TRANSACTION_DATE}
+    ${transactionId}=   Create Transaction  walletId=${walletId}  type=OUTBOUND  categoryId=${categoryId}
+    ...                                     amount=${amount}    date=${date}
     [Return]    ${transactionId}
 
 Create Inbound Transaction
-    [Arguments]     ${categoryId}=${categoryId}     ${amount}=${TRANSACTION_AMOUNT}    ${date}=${TRANSACTION_DATE}
-    ${transactionId}=   Create Transaction  type=INBOUND    categoryId=${categoryId}    amount=${amount}    date=${date}
+    [Arguments]     ${walletId}=${walletId}  ${categoryId}=${categoryId}     ${amount}=${TRANSACTION_AMOUNT}    
+    ...             ${date}=${TRANSACTION_DATE}
+    ${transactionId}=   Create Transaction  walletId=${walletId}  type=INBOUND    categoryId=${categoryId}    
+    ...                                     amount=${amount}    date=${date}
     [Return]    ${transactionId}
 
 Create Transaction
-    [Arguments]     ${type}     ${categoryId}=${None}   ${amount}=${TRANSACTION_AMOUNT}     ${date}=${TRANSACTION_DATE}
+    [Arguments]     ${walletId}=${walletId}  ${type}=${TRANSACTION_TYPE}  ${categoryId}=${None}
+    ...             ${amount}=${TRANSACTION_AMOUNT}  ${date}=${TRANSACTION_DATE}
     &{transaction}=  Build Manual Transaction   type=${type}    walletId=${walletId}    
     ...                                         categoryId=${categoryId}    amount=${amount}
     ...                                         date=${date}
@@ -177,3 +185,24 @@ Check Balance Template
     Run Keyword If      '${limitDate}' != '${Empty}'    Set To Dictionary   ${params}   limitDate=${limitDate}
     ${resp}=    GET On Session      TRANSACTIONS      /balance     params=${params}    expected_status=200
     Should Be Equal As Numbers  ${balance}  ${resp.json()['balance']}
+
+Check Balance For Each Wallet Template
+    [Arguments]     ${walletIds}=${walletIds}  ${limitDate}=${Empty}  ${balance0}=0  ${balance1}=0
+    ${params}=      Create dictionary   wallet=${walletIds}
+    Run Keyword If      '${limitDate}' != '${Empty}'    Set To Dictionary   ${params}   end-date=${limitDate}
+    ${resp}=    GET On Session      TRANSACTIONS      /wallet-balance     params=${params}    expected_status=200
+    Should Be Equal As Numbers  ${balance0}  ${resp.json()[0]['balance']}
+    Should Be Equal As Numbers  ${balance1}  ${resp.json()[1]['balance']}
+
+Check Totals 
+    [Arguments]     ${walletIds}=${walletIds}  ${startDate}=${Empty}  ${endDate}=${Equal}  
+    ...             ${inbound}=0  ${outbound}=0  ${balance}=0  ${difference}=0
+    ${params}=      Create dictionary   wallet=${walletIds}
+    Run Keyword If      '${startDate}' != '${Empty}'    Set To Dictionary   ${params}   start-date=${startDate}
+    Run Keyword If      '${endDate}' != '${Empty}'    Set To Dictionary   ${params}   end-date=${endDate}
+    ${resp}=    GET On Session      TRANSACTIONS      /totals     params=${params}    expected_status=200
+    Should Be Equal As Numbers  ${inbound}  ${resp.json()['inbound']}
+    Should Be Equal As Numbers  ${outbound}  ${resp.json()['outbound']}
+    Should Be Equal As Numbers  ${balance}  ${resp.json()['balance']}
+    Should Be Equal As Numbers  ${difference}  ${resp.json()['difference']}
+    
