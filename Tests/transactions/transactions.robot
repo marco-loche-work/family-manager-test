@@ -117,6 +117,8 @@ User Can Delete Wallet With Relative Transactions
     Transactions Count Should Be N      count=3
     Delete Wallet   ${walletId}
     Transactions Count Should Be N      count=0
+    [Teardown]  Run Keywords  Delete Category     ${outboundCategoryId}  AND
+    ...                       Delete Category     ${inboundCategoryId}
 
 User Can Delete Category Used For Transactions
     [Setup]     Setup Inbound Transaction
