@@ -29,6 +29,7 @@ Get Category
     [return]  ${resp.json()}
 
 Category Should Be Exist
+    [Arguments]     ${id}
     GET On Session      CATEGORIES      /${id}    expected_status=200
 
 Category Should Have All Data
@@ -65,8 +66,8 @@ Modify Category With Invalid Type Should Be 400
     PUT On Session  CATEGORIES  /${id}    json=${category}    expected_status=400 
 
 Delete Category
-    [Arguments]     ${category_id}=${id}
-    DELETE On Session  CATEGORIES  /${category_id}  expected_status=204
+    [Arguments]     ${id}
+    DELETE On Session  CATEGORIES  /${id}  expected_status=204
 
 Delete Categories
     [Arguments]     

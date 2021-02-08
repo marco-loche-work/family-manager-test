@@ -6,11 +6,11 @@ ${WALLET_NAME}              Wallet di test
 
 *** Keywords ***
 Create Valid Wallet     
-    [Arguments]     ${type}=${WALLET_TYPE}
-    &{data}=  Create dictionary  name=${WALLET_NAME}     type=${type}   openingBalance=${WALLET_OPENING_BALANCE}
+    [Arguments]     ${type}=${WALLET_TYPE}  ${balance}=${WALLET_OPENING_BALANCE}
+    &{data}=  Create dictionary  name=${WALLET_NAME}     type=${type}   openingBalance=${balance}
     ${resp}=  POST On Session    WALLETS   /     json=${data}   expected_status=201
-    Set Test Variable   ${walletId}  ${resp.json()['id']}
-    [Return]    ${walletId}
+    Set Test Variable   ${id}  ${resp.json()['id']}
+    [Return]    ${id}
 
 Create List Of Wallets
     ${id1}=     Create Valid Wallet
@@ -28,11 +28,11 @@ Get Wallet
     [return]  ${resp.json()}
 
 Wallet Should Be Exist
-    [Arguments]     ${id}=${walletId}
+    [Arguments]     ${id}
     GET On Session      WALLETS      /${id}    expected_status=200
 
 Wallet Should Have All Data
-    [Arguments]     ${id}=${walletId}
+    [Arguments]     ${id}
     ${wallet}=    Get Wallet   ${id}
     Should Not Be Empty     ${wallet['id']}
     Should Not Be Empty     ${wallet['name']}
@@ -64,13 +64,13 @@ Modify Wallet With Invalid Id Should Be 400
     PUT On Session  WALLETS  /X    json=&{data}   expected_status=400 
 
 Modify Wallet With Invalid Type Should Be 400
-    [Arguments]     ${id}=${walletId}
+    [Arguments]     ${id}
     ${wallet}=    Get Wallet   ${id}
     Set To dictionary   ${wallet}     type='X'
     PUT On Session  WALLETS  /${id}    json=${wallet}    expected_status=400 
 
 Delete Wallet
-    [Arguments]     ${id}=${walletId}
+    [Arguments]     ${id}
     DELETE On Session  WALLETS  /${id}  expected_status=204
 
 Delete Wallets

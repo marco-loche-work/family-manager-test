@@ -6,20 +6,23 @@ Resource              wallets.resource
 
 Suite Setup           Create Session    WALLETS    ${WALLET_URL}
 
+***Variables***
+${id}=  ${None}
+
 
 *** Test Cases ***
 User can create a valid wallet
     Create Valid Wallet
-    Wallet Should Be Exist
-    [Teardown]  Delete Wallet
+    Wallet Should Be Exist  ${id}
+    [Teardown]  Delete Wallet  ${id}
 
 User cannot create a wallet with wrong type
     Create Wallet With Invalid Type Should Be 400
 
 User can show a wallet
     [Setup]     Create Valid Wallet
-    Wallet Should Have All Data
-    [Teardown]  Delete Wallet  
+    Wallet Should Have All Data     ${id}
+    [Teardown]  Delete Wallet  ${id}
 
 User cannot show a non existing wallet
     Get Wallet Should Be 404
@@ -31,13 +34,13 @@ User can show a list of wallets
 
 User can modify a wallet
     [Setup]     Create Valid Wallet
-    Modify Created Wallet
-    [Teardown]  Delete Wallet
+    Modify Created Wallet   ${id}
+    [Teardown]  Delete Wallet  ${id}
 
 User cannot modify a wallet with wrong type
     [Setup]     Create Valid Wallet
-    Modify Wallet With Invalid Type Should Be 400
-    [Teardown]  Delete Wallet
+    Modify Wallet With Invalid Type Should Be 400   ${id}
+    [Teardown]  Delete Wallet  ${id}
 
 User cannot modify a non existing wallet
     Modify Non Existing Wallet Should Be 404
@@ -47,7 +50,7 @@ User cannot modify a wallet with wrong id
 
 User can delete an existing wallet
     [Setup]     Create Valid Wallet
-    Delete Wallet
+    Delete Wallet  ${id}
 
 User cannot delete a non existing wallet
     Delete Non Existing Wallet Should Be Not Found
