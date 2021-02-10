@@ -1,5 +1,9 @@
+***Settings***
+Library           Collections 
+
+
 *** Variables ***
-${TRANSCTIONS_URL}  http://localhost:8082/api/v1/transactions
+${TRANSCTIONS_URL}  http://localhost:8080/api/v1/transactions
 
 ${TRANSACTION_DATE}         2020-08-18T21:00:00Z
 ${TRANSACTION_AMOUNT}       200
@@ -104,6 +108,11 @@ Get Transaction By Id
     ${resp}=    GET On Session      TRANSACTIONS      /${transactionId}    expected_status=200
     [return]  ${resp.json()}
 
+Get Wallet Transactions 
+    [Arguments]     ${walletId}
+    ${resp}=    GET On Session      TRANSACTIONS      /  params=wallet=${walletId}    expected_status=200
+    [return]  ${resp.json()}
+
 Get Transaction By Id Should Return 404
     ${resp}=    GET On Session      TRANSACTIONS      /X    expected_status=404
 
@@ -155,12 +164,12 @@ Delete Transaction Should Return 404
     DELETE On Session  TRANSACTIONS  /X  expected_status=404
 
 Update Transaction
-    [Arguments]     ${transactionId}=${transactionId}
+    [Arguments]     ${transactionId}=${transactionId}   ${description}=modified description
     ${transaction}=    Get Transaction By Id  ${transactionId}
-    Set To dictionary   ${transaction}     description='modified description'
+    Set To dictionary   ${transaction}     description=${description}
     PUT On Session  TRANSACTIONS  /${transactionId}    json=${transaction}    expected_status=204 
     ${transaction}=    Get Transaction By Id  ${transactionId}
-    Should Be Equal As Strings      ${transaction['description']}  'modified description'
+    Should Be Equal As Strings      ${transaction['description']}  ${description}
 
 Update Transaction Should Return 404 
     [Arguments]     ${transactionId}=${transactionId}

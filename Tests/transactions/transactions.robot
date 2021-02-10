@@ -237,7 +237,3 @@ Suite Setup
     Create Session    TRANSACTIONS    ${TRANSCTIONS_URL}
     Create Session    WALLETS         ${WALLET_URL}
     Create Session    CATEGORIES      ${CATEGORIES_URL}
-
-Create Totals
-    &{totals}=  Create Dictionary   inbound=0   outbound=20  balance=1080  difference=-20
-    [Return]    &{totals}   

@@ -1,6 +1,6 @@
 *** Variables ***
 ${SERVER}         
-${CATEGORIES_URL}  http://localhost:8082/api/v1/categories
+${CATEGORIES_URL}  http://localhost:8080/api/v1/categories
 ${CATEGORY_NAME}   category test         
 ${CATEGORY_TYPE}   INBOUND
 

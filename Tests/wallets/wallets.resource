@@ -1,5 +1,5 @@
 *** Variables ***
-${WALLET_URL}               http://localhost:8082/api/v1/wallets  
+${WALLET_URL}               http://localhost:8080/api/v1/wallets  
 ${WALLET_OPENING_BALANCE}   120
 ${WALLET_TYPE}              MANUAL
 ${WALLET_NAME}              Wallet di test
