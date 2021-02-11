@@ -1,8 +1,11 @@
+***Settings***
+Resource           ../common.resource 
+
+
 *** Variables ***
-${SERVER}         
-${CATEGORIES_URL}  http://localhost:8080/api/v1/categories
 ${CATEGORY_NAME}   category test         
 ${CATEGORY_TYPE}   INBOUND
+
 
 *** Keywords ***
 Create Valid Category   

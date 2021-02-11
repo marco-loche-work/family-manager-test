@@ -1,10 +1,10 @@
 ***Settings***
 Library           Collections 
 
+Resource          ../common.resource 
+
 
 *** Variables ***
-${TRANSCTIONS_URL}  http://localhost:8080/api/v1/transactions
-
 ${TRANSACTION_DATE}         2020-08-18T21:00:00Z
 ${TRANSACTION_AMOUNT}       200
 ${TRANSACTION_DESCRIPTION}  fake transaction description
@@ -215,3 +215,10 @@ Check Totals
     Should Be Equal As Numbers  ${balance}  ${resp.json()['balance']}
     Should Be Equal As Numbers  ${difference}  ${resp.json()['difference']}
     
+Upload Excel Transactions
+    [Arguments]     ${status}=200
+    Upload Excel   ${TRANSACTIONS_URL}/upload/${walletId}  file_path=${CURDIR}/files/transactions.xlsx  expected_status=${status}
+
+Upload Csv Transactions
+    [Arguments]     ${status}=200
+    Upload Csv   ${TRANSACTIONS_URL}/upload/${walletId}  file_path=${CURDIR}/files/file.csv  expected_status=${status}

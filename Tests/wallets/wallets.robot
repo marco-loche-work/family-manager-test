@@ -3,8 +3,9 @@ Library               RequestsLibrary
 Library               Collections  
 
 Resource              wallets.resource  
+Resource              ../common.resource 
 
-Suite Setup           Create Session    WALLETS    ${WALLET_URL}
+Suite Setup           Suite Setup
 
 ***Variables***
 ${id}=  ${None}

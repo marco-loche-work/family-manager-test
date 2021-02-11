@@ -5,6 +5,7 @@ Library           Collections
 Resource          transactions.resource  
 Resource          ../wallets/wallets.resource  
 Resource          ../categories/categories.resource  
+Resource          ../common.resource 
 
 Suite Setup       Suite Setup
 
@@ -233,7 +234,4 @@ Delete All Entities
     Delete Wallet  ${walletId}
     Delete Category  ${categoryId}
 
-Suite Setup
-    Create Session    TRANSACTIONS    ${TRANSCTIONS_URL}
-    Create Session    WALLETS         ${WALLET_URL}
-    Create Session    CATEGORIES      ${CATEGORIES_URL}
+

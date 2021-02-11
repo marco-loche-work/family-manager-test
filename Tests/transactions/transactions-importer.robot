@@ -6,6 +6,7 @@ Library     ../libraries/UploadFile.py
 Resource          transactions.resource  
 Resource          ../wallets/wallets.resource  
 Resource          ../categories/categories.resource  
+Resource          ../common.resource 
 
 Suite Setup       Suite Setup
 
@@ -44,13 +45,6 @@ User Cannot Upload Csv Transactions On Account Wallet
 
 ***Keywords***
 
-Upload Excel Transactions
-    [Arguments]     ${status}=200
-    Upload Excel   ${TRANSCTIONS_URL}/upload/${walletId}  file_path=${CURDIR}/files/transactions.xlsx  expected_status=${status}
-
-Upload Csv Transactions
-    [Arguments]     ${status}=200
-    Upload Csv   ${TRANSCTIONS_URL}/upload/${walletId}  file_path=${CURDIR}/files/file.csv  expected_status=${status}
 
 Transaction Description Sould Be
     [Arguments]     ${id}   ${description}
@@ -65,6 +59,4 @@ Update First Transaction
     Update Transaction   ${id}  pippo
     [Return]    ${id}
 
-Suite Setup
-    Create Session    TRANSACTIONS    ${TRANSCTIONS_URL}
-    Create Session    WALLETS         ${WALLET_URL}
+

@@ -2,12 +2,14 @@
 Library               RequestsLibrary
 Library               Collections  
 
-Resource              categories.resource  
+Resource              categories.resource 
+Resource              ../common.resource 
 
-Suite Setup           Create Session    CATEGORIES    ${CATEGORIES_URL}
+Suite Setup           Suite Setup
 
 *** Variables ***
 ${id}=      ${None}
+
 
 *** Test Cases ***
 User can create a valid category
