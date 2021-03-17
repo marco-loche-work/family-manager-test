@@ -127,6 +127,18 @@ User Can Delete Category Used For Transactions
     Transaction Category Should Be  ${None}
     [Teardown]  Delete Wallet  ${walletId}
 
+Search Transactions With two Wallets Filter Should Return Expected Result
+    [Setup]     Set Up Multiple Transactions On Two Wallets 
+    ${walletIds}=       Catenate    SEPARATOR=,   ${balance_wallet_0}  ${balance_wallet_1}
+    Transactions Count Should Be N  walletIds=${walletIds}  count=6
+    [Teardown]  Tear Down Multiple Transactions On Two Wallets
+
+Search Transactions With Single Wallet Filter Should Return Expected Result
+    [Setup]     Set Up Multiple Transactions On Two Wallets 
+    ${walletIds}=       Catenate    SEPARATOR=,   ${balance_wallet_0}
+    Transactions Count Should Be N  walletIds=${walletIds}  count=3
+    [Teardown]  Tear Down Multiple Transactions On Two Wallets
+
 Search Transactions With Date Filter Should Return Expected Result
     [Setup]     Setup Multiple Transactions
     Transactions Count Should Be N  startDate=2020-01-01  endDate=2020-02-01   count=2
@@ -186,6 +198,8 @@ Setup Multiple Transactions
     Set Test Variable   ${inboundCategoryId}
     ${outboundCategoryId}=   Create Outbound Category
     Set Test Variable   ${outboundCategoryId}
+    ${ids}=     Catenate    SEPARATOR=,   ${walletId}
+    Set Test Variable   ${walletIds}    ${ids}
     Create Outbound Transaction     amount=10    date=2020-01-01     categoryId=${outboundCategoryId}
     Create Outbound Transaction     amount=20    date=2020-02-01     categoryId=${outboundCategoryId}
     Create Inbound Transaction      amount=100   date=2020-03-01     categoryId=${inboundCategoryId}

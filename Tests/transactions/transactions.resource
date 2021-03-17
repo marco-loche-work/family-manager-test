@@ -9,6 +9,7 @@ ${TRANSACTION_DATE}         2020-08-18T21:00:00Z
 ${TRANSACTION_AMOUNT}       200
 ${TRANSACTION_DESCRIPTION}  fake transaction description
 ${TRANSACTION_TYPE}         OUTBOUND
+${walletIds}                
 
 
 *** Keywords ***
@@ -122,9 +123,9 @@ Transactions Lenght Should Be Greater Than One
     Should Be True      ${count}>1
 
 Get Params
-    [Arguments]     ${walletId}=${walletId}  ${startDate}=${Empty}  ${endDate}=${Empty}  
+    [Arguments]     ${walletIds}=${walletIds}  ${startDate}=${Empty}  ${endDate}=${Empty}  
     ...             ${type}=${Empty}  ${categoryId}=${Empty}
-    ${params}=      Create dictionary   wallet=${walletId}  
+    ${params}=      Create dictionary   wallet=${walletIds}  
     Run Keyword If      '${startDate}' != '${Empty}'    Set To Dictionary   ${params}   startDate=${startDate}
     Run Keyword If      '${endDate}' != '${Empty}'   Set To Dictionary   ${params}   endDate=${endDate}
     Run Keyword If      '${type}' != '${Empty}'   Set To Dictionary   ${params}   type=${type}
@@ -132,11 +133,11 @@ Get Params
     [Return]    ${params}
 
 Transactions Count Should Be N
-    [Arguments]     ${walletId}=${walletId}  ${startDate}=${Empty}  
+    [Arguments]     ${walletIds}=${walletIds}  ${startDate}=${Empty}  
     ...             ${endDate}=${Empty}  ${type}=${Empty}  ${categoryId}=${Empty}
     ...             ${count}=0
-    ${params}=      Get Params   walletId=${walletId}  startDate=${startDate}  endDate=${endDate}  
-    ...                                 type=${type}  categoryId=${categoryId}
+    ${params}=      Get Params   walletIds=${walletIds}  startDate=${startDate}  endDate=${endDate}  
+    ...                          type=${type}  categoryId=${categoryId}
     ${resp}=    GET On Session      TRANSACTIONS      /search     params=${params}    expected_status=200
     ${transactionsCount}=   Get length    ${resp.json()}
     Should Be Equal As Numbers      ${transactionsCount}    ${count}
