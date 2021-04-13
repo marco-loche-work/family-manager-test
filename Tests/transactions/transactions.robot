@@ -146,6 +146,13 @@ Search Transactions With Date Filter Should Return Expected Result
     ...                         Delete Category  ${inboundCategoryId}  AND  
     ...                         Delete Category  ${outboundCategoryId}
 
+Search Transactions With Limit Filter Should Return Expected Result
+    [Setup]     Setup Multiple Transactions
+    Transactions Count Should Be N  limit=2   count=2
+    [Teardown]  Run Keywords    Delete Wallet  ${walletId}  AND  
+    ...                         Delete Category  ${inboundCategoryId}  AND  
+    ...                         Delete Category  ${outboundCategoryId}
+
 Search Transactions With Type Filter Should Return Expected Result
     [Setup]     Setup Multiple Transactions
     Transactions Count Should Be N  type=OUTBOUND   count=2

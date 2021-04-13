@@ -124,20 +124,21 @@ Transactions Lenght Should Be Greater Than One
 
 Get Params
     [Arguments]     ${walletIds}=${walletIds}  ${startDate}=${Empty}  ${endDate}=${Empty}  
-    ...             ${type}=${Empty}  ${categoryId}=${Empty}
+    ...             ${type}=${Empty}  ${categoryId}=${Empty}  ${limit}=${Empty}
     ${params}=      Create dictionary   wallet=${walletIds}  
     Run Keyword If      '${startDate}' != '${Empty}'    Set To Dictionary   ${params}   startDate=${startDate}
     Run Keyword If      '${endDate}' != '${Empty}'   Set To Dictionary   ${params}   endDate=${endDate}
     Run Keyword If      '${type}' != '${Empty}'   Set To Dictionary   ${params}   type=${type}
     Run Keyword If      '${categoryId}' != '${Empty}'   Set To Dictionary   ${params}   category=${categoryId}
+    Run Keyword If      '${limit}' != '${Empty}'   Set To Dictionary   ${params}   limit=${limit}
     [Return]    ${params}
 
 Transactions Count Should Be N
     [Arguments]     ${walletIds}=${walletIds}  ${startDate}=${Empty}  
-    ...             ${endDate}=${Empty}  ${type}=${Empty}  ${categoryId}=${Empty}
+    ...             ${endDate}=${Empty}  ${type}=${Empty}  ${categoryId}=${Empty}   ${limit}=${Empty}
     ...             ${count}=0
     ${params}=      Get Params   walletIds=${walletIds}  startDate=${startDate}  endDate=${endDate}  
-    ...                          type=${type}  categoryId=${categoryId}
+    ...                          type=${type}  categoryId=${categoryId}  limit=${limit}
     ${resp}=    GET On Session      TRANSACTIONS      /search     params=${params}    expected_status=200
     ${transactionsCount}=   Get length    ${resp.json()}
     Should Be Equal As Numbers      ${transactionsCount}    ${count}
