@@ -191,6 +191,9 @@ Get Totals Return Expected Value
     walletIds=${walletIds}  startDate=${Empty}  endDate=2020-01-01  inbound=0  outbound=20  balance=1080  difference=-20
     walletIds=${walletIds}  startDate=${Empty}  endDate=2020-02-01  inbound=0  outbound=60  balance=1040  difference=-60
     walletIds=${walletIds}  startDate=${Empty}  endDate=2020-04-01  inbound=200  outbound=60  balance=1240  difference=140
+    #
+    walletIds=${walletIds}  categoryIds=${categoryIds}  startDate=2020-01-01  endDate=2020-03-31  inbound=200  outbound=0  balance=1240  difference=200
+    #
     walletIds=${walletIds}  startDate=2020-02-01  endDate=${Empty}  inbound=200  outbound=40  balance=1240  difference=160
     walletIds=${walletIds}  startDate=2020-03-01  endDate=${Empty}  inbound=200  outbound=0  balance=1240  difference=200
     walletIds=${walletIds}  startDate=2020-01-01  endDate=2020-02-01  inbound=0  outbound=60  balance=1040  difference=-60
@@ -223,6 +226,8 @@ Set Up Multiple Transactions On Two Wallets
     Set Test Variable   ${outboundCategoryId}
     ${walletIds}=   Catenate    SEPARATOR=,   ${balance_wallet_0}  ${balance_wallet_1}
     Set Test Variable   ${walletIds}
+    ${categoryIds}=   Catenate    SEPARATOR=,   ${inboundCategoryId}
+    Set Test Variable   ${categoryIds}
     Create Outbound Transaction     walletId=${balance_wallet_0}  amount=10   date=2020-01-01  categoryId=${outboundCategoryId}
     Create Outbound Transaction     walletId=${balance_wallet_0}  amount=20   date=2020-02-01  categoryId=${outboundCategoryId}
     Create Inbound Transaction      walletId=${balance_wallet_0}  amount=100  date=2020-03-01  categoryId=${inboundCategoryId}

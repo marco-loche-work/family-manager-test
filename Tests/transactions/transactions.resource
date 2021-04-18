@@ -10,7 +10,7 @@ ${TRANSACTION_AMOUNT}       200
 ${TRANSACTION_DESCRIPTION}  fake transaction description
 ${TRANSACTION_TYPE}         OUTBOUND
 ${walletIds}                
-
+${categoryIds}
 
 *** Keywords ***
 
@@ -206,9 +206,9 @@ Check Balance For Each Wallet Template
     Should Be Equal As Numbers  ${balance1}  ${resp.json()[1]['balance']}
 
 Check Totals 
-    [Arguments]     ${walletIds}=${walletIds}  ${startDate}=${Empty}  ${endDate}=${Equal}  
+    [Arguments]     ${walletIds}=${walletIds}  ${startDate}=${Empty}  ${endDate}=${Empty}  ${categoryIds}=${categoryIds}
     ...             ${inbound}=0  ${outbound}=0  ${balance}=0  ${difference}=0
-    ${params}=      Create dictionary   wallet=${walletIds}
+    ${params}=      Create dictionary   wallet=${walletIds}     category=${categoryIds}
     Run Keyword If      '${startDate}' != '${Empty}'    Set To Dictionary   ${params}   start-date=${startDate}
     Run Keyword If      '${endDate}' != '${Empty}'    Set To Dictionary   ${params}   end-date=${endDate}
     ${resp}=    GET On Session      TRANSACTIONS      /totals     params=${params}    expected_status=200
