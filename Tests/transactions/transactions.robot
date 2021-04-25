@@ -188,17 +188,35 @@ Get Balance For Each Wallet Return Expected Value
 Get Totals Return Expected Value
     [Setup]     Set Up Multiple Transactions On Two Wallets
     [Template]  Check Totals
-    walletIds=${walletIds}  startDate=${Empty}  endDate=2020-01-01  inbound=0  outbound=20  balance=1080  difference=-20
-    walletIds=${walletIds}  startDate=${Empty}  endDate=2020-02-01  inbound=0  outbound=60  balance=1040  difference=-60
-    walletIds=${walletIds}  startDate=${Empty}  endDate=2020-04-01  inbound=200  outbound=60  balance=1240  difference=140
-    #
-    walletIds=${walletIds}  categoryIds=${categoryIds}  startDate=2020-01-01  endDate=2020-03-31  inbound=200  outbound=0  balance=1240  difference=200
-    #
-    walletIds=${walletIds}  startDate=2020-02-01  endDate=${Empty}  inbound=200  outbound=40  balance=1240  difference=160
-    walletIds=${walletIds}  startDate=2020-03-01  endDate=${Empty}  inbound=200  outbound=0  balance=1240  difference=200
-    walletIds=${walletIds}  startDate=2020-01-01  endDate=2020-02-01  inbound=0  outbound=60  balance=1040  difference=-60
-    walletIds=${walletIds}  startDate=2020-02-01  endDate=2020-02-01  inbound=0  outbound=40  balance=1040  difference=-40
+    walletIds=${walletIds}  categoryIds=${Empty}  startDate=${Empty}  endDate=2020-01-01  inbound=0  outbound=20  difference=-20
+    walletIds=${walletIds}  categoryIds=${Empty}  startDate=${Empty}  endDate=2020-02-01  inbound=0  outbound=60  difference=-60
+    walletIds=${walletIds}  categoryIds=${Empty}  startDate=${Empty}  endDate=2020-04-01  inbound=200  outbound=60  difference=140
+    walletIds=${walletIds}  categoryIds=${Empty}  startDate=2020-02-01  endDate=${Empty}  inbound=200  outbound=40  difference=160
+    walletIds=${walletIds}  categoryIds=${Empty}  startDate=2020-03-01  endDate=${Empty}  inbound=200  outbound=0  difference=200
+    walletIds=${walletIds}  categoryIds=${Empty}  startDate=2020-01-01  endDate=2020-02-01  inbound=0  outbound=60  difference=-60
+    walletIds=${walletIds}  categoryIds=${Empty}  startDate=2020-02-01  endDate=2020-02-01  inbound=0  outbound=40  difference=-40
+    walletIds=${walletIds}  categoryIds=${categoryIds}  startDate=2020-01-01  endDate=2020-03-31  inbound=200  outbound=0  difference=200
     [Teardown]  Tear Down Multiple Transactions On Two Wallets
+
+Get Categories Transaction Should Return Expected Values
+    [Setup]     Setup Multiple Transactions With Different Categories
+    ${resp}=    Get Transactions Group By categories  startDate=2020-01-01  endDate=2020-01-31
+    Check Transactions By Category  ${resp.json()}  ${categories}[0]  110  2
+    Check Transactions By Category  ${resp.json()}  ${categories}[1]  1100  2
+    ${resp}=    Get Transactions Group By categories  startDate=2020-01-01  endDate=2020-02-28
+    Check Transactions By Category  ${resp.json()}  ${categories}[0]  1210  4
+    Check Transactions By Category  ${resp.json()}  ${categories}[1]  12100  4
+    ${resp}=    Get Transactions Group By categories  startDate=2020-01-01  endDate=2020-03-31
+    Check Transactions By Category  ${resp.json()}  ${categories}[0]  6260  6
+    Check Transactions By Category  ${resp.json()}  ${categories}[1]  62600  6
+    ${resp}=    Get Transactions Group By categories  startDate=2020-01-02  endDate=2020-03-31
+    Check Transactions By Category  ${resp.json()}  ${categories}[0]  6150  4
+    Check Transactions By Category  ${resp.json()}  ${categories}[1]  61500  4
+    [Teardown]  Run Keywords    Delete Wallet    ${walletId}  AND 
+    ...                         Delete Category  ${categories}[0]  AND
+    ...                         Delete Category  ${categories}[1]
+
+
 
 ***Keywords***
 
@@ -213,7 +231,23 @@ Setup Multiple Transactions
     Create Outbound Transaction     amount=10    date=2020-01-01     categoryId=${outboundCategoryId}
     Create Outbound Transaction     amount=20    date=2020-02-01     categoryId=${outboundCategoryId}
     Create Inbound Transaction      amount=100   date=2020-03-01     categoryId=${inboundCategoryId}
-    
+
+Setup Multiple Transactions With Different Categories
+    Create Manual Wallet    balance=0
+    ${result}=  Create List Of Categories
+    Set Test Variable   ${categories}   ${result}
+    Create Inbound Transaction      amount=100   date=2020-01-01     categoryId=${categories}[0]
+    Create Inbound Transaction      amount=10    date=2020-01-01     categoryId=${categories}[0]
+    Create Inbound Transaction      amount=1000  date=2020-02-01     categoryId=${categories}[0]
+    Create Inbound Transaction      amount=100   date=2020-02-01     categoryId=${categories}[0]
+    Create Inbound Transaction      amount=50    date=2020-03-01     categoryId=${categories}[0]
+    Create Inbound Transaction      amount=5000  date=2020-03-01     categoryId=${categories}[0]
+    Create Inbound Transaction      amount=1000   date=2020-01-01     categoryId=${categories}[1]
+    Create Inbound Transaction      amount=100    date=2020-01-01     categoryId=${categories}[1]
+    Create Inbound Transaction      amount=10000  date=2020-02-01     categoryId=${categories}[1]
+    Create Inbound Transaction      amount=1000   date=2020-02-01     categoryId=${categories}[1]
+    Create Inbound Transaction      amount=500    date=2020-03-01     categoryId=${categories}[1]
+    Create Inbound Transaction      amount=50000  date=2020-03-01     categoryId=${categories}[1]
 
 Set Up Multiple Transactions On Two Wallets
     ${balance_wallet_0}=    Create Manual Wallet    balance=100
@@ -261,3 +295,4 @@ Delete All Entities
     Delete Category  ${categoryId}
 
 
+    

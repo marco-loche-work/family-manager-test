@@ -1,5 +1,6 @@
 ***Settings***
 Library           Collections 
+Library           ../libraries/ListFinder.py
 
 Resource          ../common.resource 
 
@@ -207,14 +208,13 @@ Check Balance For Each Wallet Template
 
 Check Totals 
     [Arguments]     ${walletIds}=${walletIds}  ${startDate}=${Empty}  ${endDate}=${Empty}  ${categoryIds}=${categoryIds}
-    ...             ${inbound}=0  ${outbound}=0  ${balance}=0  ${difference}=0
+    ...             ${inbound}=0  ${outbound}=0  ${difference}=0
     ${params}=      Create dictionary   wallet=${walletIds}     category=${categoryIds}
     Run Keyword If      '${startDate}' != '${Empty}'    Set To Dictionary   ${params}   start-date=${startDate}
     Run Keyword If      '${endDate}' != '${Empty}'    Set To Dictionary   ${params}   end-date=${endDate}
     ${resp}=    GET On Session      TRANSACTIONS      /totals     params=${params}    expected_status=200
     Should Be Equal As Numbers  ${inbound}  ${resp.json()['inbound']}
     Should Be Equal As Numbers  ${outbound}  ${resp.json()['outbound']}
-    Should Be Equal As Numbers  ${balance}  ${resp.json()['balance']}
     Should Be Equal As Numbers  ${difference}  ${resp.json()['difference']}
     
 Upload Excel Transactions
@@ -224,3 +224,19 @@ Upload Excel Transactions
 Upload Csv Transactions
     [Arguments]     ${status}=200
     Upload Csv   ${TRANSACTIONS_URL}/upload/${walletId}  file_path=${CURDIR}/files/file.csv  expected_status=${status}
+
+Get Transactions Group By categories
+    [Arguments]     ${startDate}  ${endDate}  ${walletIds}=${walletIds}
+    ${params}=      Create dictionary   start-date=${startDate}  end-date=${endDate}
+    ${resp}=    GET On Session      TRANSACTIONS      /categories     params=${params}    expected_status=200
+    [Return]    ${resp}
+
+
+Check Transactions By Category
+    [Arguments]     ${categoryTransactions}  ${categoryId}  ${sum}  ${count}
+    ${categoryTransactionGroup}=    Find In List  ${categoryTransactions}   categoryId  ${categoryId}
+    ${amount}=  Get From Dictionary  ${categoryTransactionGroup}  amount  
+    ${num}=  Get From Dictionary  ${categoryTransactionGroup}  count  
+    Should Be Equal As Numbers  ${amount}  ${sum}
+    Should Be Equal As Numbers  ${num}  ${count}
+    
