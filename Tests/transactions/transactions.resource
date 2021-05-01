@@ -17,9 +17,9 @@ ${categoryIds}
 
 Build Manual Transaction 
     [Arguments]       ${id}=${None}  ${walletId}=${None}  ${type}=OUTBOUND   ${categoryId}=${categoryId}    
-    ...               ${amount}=${TRANSACTION_AMOUNT}   ${date}=${TRANSACTION_DATE}
+    ...               ${amount}=${TRANSACTION_AMOUNT}   ${date}=${TRANSACTION_DATE}  ${description}=${TRANSACTION_DESCRIPTION}
     &{transaction}=   Create dictionary   id=${id}  walletId=${walletId}  transactionDate=${date}  
-    ...               amount=${amount}  description=${TRANSACTION_DESCRIPTION}  type=${type}    
+    ...               amount=${amount}  description=${description}  type=${type}    
     ...               categoryId=${categoryId}  
     [Return]    &{transaction}
 
@@ -55,24 +55,24 @@ Create Category Of type
 
 Create Outbound Transaction
     [Arguments]     ${walletId}=${walletId}  ${categoryId}=${categoryId}  ${amount}=${TRANSACTION_AMOUNT}     
-    ...             ${date}=${TRANSACTION_DATE}
+    ...             ${date}=${TRANSACTION_DATE}  ${description}=${TRANSACTION_DESCRIPTION}
     ${transactionId}=   Create Transaction  walletId=${walletId}  type=OUTBOUND  categoryId=${categoryId}
-    ...                                     amount=${amount}    date=${date}
+    ...                                     amount=${amount}    date=${date}  description=${description}
     [Return]    ${transactionId}
 
 Create Inbound Transaction
     [Arguments]     ${walletId}=${walletId}  ${categoryId}=${categoryId}     ${amount}=${TRANSACTION_AMOUNT}    
-    ...             ${date}=${TRANSACTION_DATE}
+    ...             ${date}=${TRANSACTION_DATE}  ${description}=${TRANSACTION_DESCRIPTION}
     ${transactionId}=   Create Transaction  walletId=${walletId}  type=INBOUND    categoryId=${categoryId}    
-    ...                                     amount=${amount}    date=${date}
+    ...                                     amount=${amount}    date=${date}  description=${description}
     [Return]    ${transactionId}
 
 Create Transaction
     [Arguments]     ${walletId}=${walletId}  ${type}=${TRANSACTION_TYPE}  ${categoryId}=${None}
-    ...             ${amount}=${TRANSACTION_AMOUNT}  ${date}=${TRANSACTION_DATE}
+    ...             ${amount}=${TRANSACTION_AMOUNT}  ${date}=${TRANSACTION_DATE}  ${description}=${TRANSACTION_DESCRIPTION}
     &{transaction}=  Build Manual Transaction   type=${type}    walletId=${walletId}    
     ...                                         categoryId=${categoryId}    amount=${amount}
-    ...                                         date=${date}
+    ...                                         date=${date}  description=${description}
     ${resp}=  POST On Session    TRANSACTIONS   /     json=&{transaction}   expected_status=201
     Set Test Variable   ${transactionId}    ${resp.json()['id']}
     [Return]    ${transactionId}
@@ -125,21 +125,22 @@ Transactions Lenght Should Be Greater Than One
 
 Get Params
     [Arguments]     ${walletIds}=${walletIds}  ${startDate}=${Empty}  ${endDate}=${Empty}  
-    ...             ${type}=${Empty}  ${categoryId}=${Empty}  ${limit}=${Empty}
+    ...             ${type}=${Empty}  ${categoryId}=${Empty}  ${description}=${Empty}  ${limit}=${Empty}
     ${params}=      Create dictionary   wallet=${walletIds}  
     Run Keyword If      '${startDate}' != '${Empty}'    Set To Dictionary   ${params}   startDate=${startDate}
     Run Keyword If      '${endDate}' != '${Empty}'   Set To Dictionary   ${params}   endDate=${endDate}
     Run Keyword If      '${type}' != '${Empty}'   Set To Dictionary   ${params}   type=${type}
     Run Keyword If      '${categoryId}' != '${Empty}'   Set To Dictionary   ${params}   category=${categoryId}
+    Run Keyword If      '${description}' != '${Empty}'   Set To Dictionary   ${params}   description=${description}
     Run Keyword If      '${limit}' != '${Empty}'   Set To Dictionary   ${params}   limit=${limit}
     [Return]    ${params}
 
 Transactions Count Should Be N
     [Arguments]     ${walletIds}=${walletIds}  ${startDate}=${Empty}  
     ...             ${endDate}=${Empty}  ${type}=${Empty}  ${categoryId}=${Empty}   ${limit}=${Empty}
-    ...             ${count}=0
+    ...             ${count}=0  ${description}=${Empty}
     ${params}=      Get Params   walletIds=${walletIds}  startDate=${startDate}  endDate=${endDate}  
-    ...                          type=${type}  categoryId=${categoryId}  limit=${limit}
+    ...                          type=${type}  categoryId=${categoryId}  description=${description}  limit=${limit}  
     ${resp}=    GET On Session      TRANSACTIONS      /search     params=${params}    expected_status=200
     ${transactionsCount}=   Get length    ${resp.json()}
     Should Be Equal As Numbers      ${transactionsCount}    ${count}
@@ -233,10 +234,12 @@ Get Transactions Group By categories
 
 
 Check Transactions By Category
-    [Arguments]     ${categoryTransactions}  ${categoryId}  ${sum}  ${count}
+    [Arguments]     ${categoryTransactions}  ${categoryId}  ${sum}  ${count}  ${percentage}
     ${categoryTransactionGroup}=    Find In List  ${categoryTransactions}   categoryId  ${categoryId}
     ${amount}=  Get From Dictionary  ${categoryTransactionGroup}  amount  
     ${num}=  Get From Dictionary  ${categoryTransactionGroup}  count  
+    ${perc}=  Get From Dictionary  ${categoryTransactionGroup}  percentage  
     Should Be Equal As Numbers  ${amount}  ${sum}
     Should Be Equal As Numbers  ${num}  ${count}
+    Should Be Equal As Numbers  ${perc}  ${percentage}
     

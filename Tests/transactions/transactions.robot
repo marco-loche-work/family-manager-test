@@ -167,6 +167,15 @@ Search Transactions With Category Filter Should Return Expected Result
     ...                         Delete Category  ${inboundCategoryId}  AND  
     ...                         Delete Category  ${outboundCategoryId}
 
+Search Transactions With Description Filter Should Return Expected Result
+    [Setup]     Run Keywords  
+    ...         Create Manual Wallet    AND
+    ...         Create Outbound Transaction     amount=10    date=2020-01-01  description=abc def   AND
+    ...         Create Outbound Transaction     amount=10    date=2020-01-01  description=def ghi  AND
+    ...         Create Outbound Transaction     amount=10    date=2020-01-01  description=xyz 
+    Transactions Count Should Be N  description=def  count=2
+    [Teardown]  Delete Wallet  ${walletId}
+
 Get Balance Return Expected Value
     [Setup]     Setup Multiple Transactions
     [Template]  Check Balance Template
@@ -201,17 +210,17 @@ Get Totals Return Expected Value
 Get Categories Transaction Should Return Expected Values
     [Setup]     Setup Multiple Transactions With Different Categories
     ${resp}=    Get Transactions Group By categories  startDate=2020-01-01  endDate=2020-01-31
-    Check Transactions By Category  ${resp.json()}  ${categories}[0]  110  2
-    Check Transactions By Category  ${resp.json()}  ${categories}[1]  1100  2
+    Check Transactions By Category  ${resp.json()}  ${categories}[0]  120  2  9.8
+    Check Transactions By Category  ${resp.json()}  ${categories}[1]  1100  2  90.2
     ${resp}=    Get Transactions Group By categories  startDate=2020-01-01  endDate=2020-02-28
-    Check Transactions By Category  ${resp.json()}  ${categories}[0]  1210  4
-    Check Transactions By Category  ${resp.json()}  ${categories}[1]  12100  4
+    Check Transactions By Category  ${resp.json()}  ${categories}[0]  1220  4  9.2
+    Check Transactions By Category  ${resp.json()}  ${categories}[1]  12100  4  90.8
     ${resp}=    Get Transactions Group By categories  startDate=2020-01-01  endDate=2020-03-31
-    Check Transactions By Category  ${resp.json()}  ${categories}[0]  6260  6
-    Check Transactions By Category  ${resp.json()}  ${categories}[1]  62600  6
+    Check Transactions By Category  ${resp.json()}  ${categories}[0]  6270  6  21.7
+    Check Transactions By Category  ${resp.json()}  ${categories}[1]  22600  6  78.3
     ${resp}=    Get Transactions Group By categories  startDate=2020-01-02  endDate=2020-03-31
-    Check Transactions By Category  ${resp.json()}  ${categories}[0]  6150  4
-    Check Transactions By Category  ${resp.json()}  ${categories}[1]  61500  4
+    Check Transactions By Category  ${resp.json()}  ${categories}[0]  6150  4  22.2
+    Check Transactions By Category  ${resp.json()}  ${categories}[1]  21500  4  77.8
     [Teardown]  Run Keywords    Delete Wallet    ${walletId}  AND 
     ...                         Delete Category  ${categories}[0]  AND
     ...                         Delete Category  ${categories}[1]
@@ -236,18 +245,18 @@ Setup Multiple Transactions With Different Categories
     Create Manual Wallet    balance=0
     ${result}=  Create List Of Categories
     Set Test Variable   ${categories}   ${result}
-    Create Inbound Transaction      amount=100   date=2020-01-01     categoryId=${categories}[0]
-    Create Inbound Transaction      amount=10    date=2020-01-01     categoryId=${categories}[0]
-    Create Inbound Transaction      amount=1000  date=2020-02-01     categoryId=${categories}[0]
-    Create Inbound Transaction      amount=100   date=2020-02-01     categoryId=${categories}[0]
-    Create Inbound Transaction      amount=50    date=2020-03-01     categoryId=${categories}[0]
-    Create Inbound Transaction      amount=5000  date=2020-03-01     categoryId=${categories}[0]
+    Create Inbound Transaction      amount=100    date=2020-01-01     categoryId=${categories}[0]
+    Create Inbound Transaction      amount=20     date=2020-01-01     categoryId=${categories}[0]
+    Create Inbound Transaction      amount=1000   date=2020-02-01     categoryId=${categories}[0]
+    Create Inbound Transaction      amount=100    date=2020-02-01     categoryId=${categories}[0]
+    Create Inbound Transaction      amount=50     date=2020-03-01     categoryId=${categories}[0]
+    Create Inbound Transaction      amount=5000   date=2020-03-01     categoryId=${categories}[0]
     Create Inbound Transaction      amount=1000   date=2020-01-01     categoryId=${categories}[1]
     Create Inbound Transaction      amount=100    date=2020-01-01     categoryId=${categories}[1]
     Create Inbound Transaction      amount=10000  date=2020-02-01     categoryId=${categories}[1]
     Create Inbound Transaction      amount=1000   date=2020-02-01     categoryId=${categories}[1]
-    Create Inbound Transaction      amount=500    date=2020-03-01     categoryId=${categories}[1]
-    Create Inbound Transaction      amount=50000  date=2020-03-01     categoryId=${categories}[1]
+    Create Inbound Transaction      amount=5000   date=2020-03-01     categoryId=${categories}[1]
+    Create Inbound Transaction      amount=5500   date=2020-03-01     categoryId=${categories}[1]
 
 Set Up Multiple Transactions On Two Wallets
     ${balance_wallet_0}=    Create Manual Wallet    balance=100
